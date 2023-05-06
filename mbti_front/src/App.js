@@ -5,7 +5,22 @@ import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
 import questionnaireData from './data/questionnaire.json';
 
+const shuffleArray = (array) => {
+  // Create a copy of the original array
+  const shuffledArray = [...array];
+  
+  // Perform Fisher-Yates shuffle algorithm
+  for (let i = shuffledArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+  }
+  
+  return shuffledArray;
+};
+
 const App = () => {
+  const shuffledQuestions = shuffleArray(Object.entries(questionnaireData));
+
   const surveyJson = {
     title: 'Genshin MBTI Test',
     showProgressBar: 'bottom',
@@ -21,7 +36,7 @@ const App = () => {
           },
         ],
       },
-      ...Object.entries(questionnaireData).map(([questionId, question]) => ({
+      ...shuffledQuestions.map(([questionId, question]) => ({
         elements: [
           {
             type: 'radiogroup',
