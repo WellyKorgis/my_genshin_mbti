@@ -56,9 +56,33 @@ const App = () => {
 
   const survey = new Model(surveyJson);
   const surveyResults = useCallback((sender) => {
-    const results =JSON.stringify(sender.data);
+    const results = calculate(sender.data);
     alert(results);
   }, []);
+
+  const calculate = (data) => {
+    const mbti = new Map([
+      ['E', 0],
+      ['I', 0],
+      ['S', 0],
+      ['N', 0],
+      ['F', 0],
+      ['T', 0],
+      ['J', 0],
+      ['P', 0]
+    ]);
+
+    Object.values(data).forEach(value => {
+      mbti[value]++;
+    });
+
+    var EI = mbti['E'] > mbti['I'] ? 'E' : 'I';
+    var SN = mbti['S'] > mbti['N'] ? 'S' : 'N';
+    var FT = mbti['F'] > mbti['T'] ? 'F' : 'T';
+    var JP = mbti['J'] > mbti['P'] ? 'J' : 'P';
+
+    return EI + SN + FT + JP;
+  }
 
   survey.onComplete.add(surveyResults);
 
