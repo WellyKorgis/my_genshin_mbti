@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import './App.css';
 import 'survey-core/defaultV2.min.css';
 import { Model } from 'survey-core';
@@ -8,13 +8,13 @@ import questionnaireData from './data/questionnaire.json';
 const shuffleArray = (array) => {
   // Create a copy of the original array
   const shuffledArray = [...array];
-  
+
   // Perform Fisher-Yates shuffle algorithm
   for (let i = shuffledArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
   }
-  
+
   return shuffledArray;
 };
 
@@ -55,6 +55,12 @@ const App = () => {
   };
 
   const survey = new Model(surveyJson);
+  const surveyResults = useCallback((sender) => {
+    const results =JSON.stringify(sender.data);
+    alert(results);
+  }, []);
+
+  survey.onComplete.add(surveyResults);
 
   return <Survey model={survey} id="surveyContainer" />;
 };
