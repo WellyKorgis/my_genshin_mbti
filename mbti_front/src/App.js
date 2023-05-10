@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import './App.css';
 import 'survey-core/defaultV2.min.css';
 import { Model } from 'survey-core';
@@ -8,13 +8,13 @@ import questionnaireData from './data/questionnaire.json';
 const shuffleArray = (array) => {
   // Create a copy of the original array
   const shuffledArray = [...array];
-  
+
   // Perform Fisher-Yates shuffle algorithm
   for (let i = shuffledArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
   }
-  
+
   return shuffledArray;
 };
 
@@ -55,6 +55,36 @@ const App = () => {
   };
 
   const survey = new Model(surveyJson);
+  const surveyResults = useCallback((sender) => {
+    const results = calculate(sender.data);
+    alert(results);
+  }, []);
+
+  const calculate = (data) => {
+    const mbti = new Map([
+      ['E', 0],
+      ['I', 0],
+      ['S', 0],
+      ['N', 0],
+      ['F', 0],
+      ['T', 0],
+      ['J', 0],
+      ['P', 0]
+    ]);
+
+    Object.values(data).forEach(value => {
+      mbti[value]++;
+    });
+
+    var EI = mbti['E'] > mbti['I'] ? 'E' : 'I';
+    var SN = mbti['S'] > mbti['N'] ? 'S' : 'N';
+    var FT = mbti['F'] > mbti['T'] ? 'F' : 'T';
+    var JP = mbti['J'] > mbti['P'] ? 'J' : 'P';
+
+    return EI + SN + FT + JP;
+  }
+
+  survey.onComplete.add(surveyResults);
 
   return <Survey model={survey} id="surveyContainer" />;
 };
