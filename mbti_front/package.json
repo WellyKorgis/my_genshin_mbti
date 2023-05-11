@@ -26,6 +26,15 @@
       "react-app/jest"
     ]
   },
+
+  "cssnano": {
+    "preset": [
+      "default",
+      {
+        "calc": false
+      }
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",
