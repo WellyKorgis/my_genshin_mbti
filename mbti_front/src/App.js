@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import './App.css';
 import 'survey-core/defaultV2.min.css';
 import { Model } from 'survey-core';
@@ -19,6 +19,9 @@ const shuffleArray = (array) => {
 };
 
 const App = () => {
+  const [result, setResult] = useState('');
+  const [showResultPage, setShowResultPage] = useState(false);
+
   const shuffledQuestions = shuffleArray(Object.entries(questionnaireData));
 
   const surveyJson = {
@@ -31,8 +34,7 @@ const App = () => {
         elements: [
           {
             type: 'html',
-            html:
-              'Find your MBTI type and your Genshin character.',
+            html: 'Find your MBTI type and your Genshin character.',
           },
         ],
       },
@@ -51,16 +53,12 @@ const App = () => {
         ],
       })),
     ],
-    completedHtml: '<h4>You completed the quiz.</h4>',
+    completedHtml: `You are <h3>${result}</h3>`,
   };
 
   const survey = new Model(surveyJson);
-  const surveyResults = useCallback((sender) => {
-    const results = calculate(sender.data);
-    alert(results);
-  }, []);
 
-  const calculate = (data) => {
+  const calculate = useCallback((data) => {
     const mbti = new Map([
       ['E', 0],
       ['I', 0],
@@ -69,20 +67,26 @@ const App = () => {
       ['F', 0],
       ['T', 0],
       ['J', 0],
-      ['P', 0]
+      ['P', 0],
     ]);
 
-    Object.values(data).forEach(value => {
+    Object.values(data).forEach((value) => {
       mbti[value]++;
     });
 
-    var EI = mbti['E'] > mbti['I'] ? 'E' : 'I';
-    var SN = mbti['S'] > mbti['N'] ? 'S' : 'N';
-    var FT = mbti['F'] > mbti['T'] ? 'F' : 'T';
-    var JP = mbti['J'] > mbti['P'] ? 'J' : 'P';
+    const EI = mbti.get('E') > mbti.get('I') ? 'E' : 'I';
+    const SN = mbti.get('S') > mbti.get('N') ? 'S' : 'N';
+    const FT = mbti.get('F') > mbti.get('T') ? 'F' : 'T';
+    const JP = mbti.get('J') > mbti.get('P') ? 'J' : 'P';
 
     return EI + SN + FT + JP;
-  }
+  }, []);
+
+  const surveyResults = useCallback((sender) => {
+    const calculatedResult = calculate(sender.data);
+    setResult(calculatedResult);
+    setShowResultPage(true);
+  }, [calculate]);
 
   survey.onComplete.add(surveyResults);
 
